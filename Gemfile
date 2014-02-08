@@ -5,9 +5,11 @@ gem 'rails', '4.0.0'
 gem 'omniauth'
 gem 'omniauth-facebook', '1.4.0'
 gem 'capistrano', '~> 3.1.0'
+gem 'coffee-rails'
 
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
+gem 'pg'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'
