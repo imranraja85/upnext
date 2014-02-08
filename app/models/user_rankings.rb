@@ -1,10 +1,11 @@
 class UserRankings
   attr_accessor :user
+
   def initialize(user)
     @user = user
   end
 
-  def movies_voted_on
+  def movies
     Redis.current.zrange("votes:userMovies:#{user.id}", 0, -1, {with_scores: true})
   end
 
