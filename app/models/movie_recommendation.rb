@@ -20,4 +20,29 @@ class MovieRecommendation
       :director_rankings => director_rankings
     }
   end
+
+  def movies_by_favorite_actor
+  end
 end
+
+/*
+
+Look at the top x genres
+Look at the top x actors
+Look at the top x directors
+Look at the top x writers
+
+Genres
+-----
+Action: 100
+Drama: 15
+Romance: 1
+[A * 100, D * 15, R * 1].sample => your genre
+
+Actors
+-----
+Bill Murray: 100
+Chuck Norris: 10
+[B * 100, C * 10].sample => your genre
+
+*/
