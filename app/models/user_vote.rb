@@ -3,7 +3,7 @@ class UserVote
 
   def initialize(user, movie_id, vote)
     @user       = user
-    @movie_id   = 117665
+    @movie_id   = movie_id
     @vote       = vote #this needs to be a numerical value
     @movie      = Movie.new(@movie_id)
   end
