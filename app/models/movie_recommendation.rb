@@ -2,7 +2,6 @@ class MovieRecommendation
   attr_accessor :user, :user_rankings
 
   def initialize(user)
-    @user = user
     @user_rankings = UserRankings.new(user)
   end
 

@@ -6,6 +6,7 @@ Upnext::Application.routes.draw do
   namespace :api do
     get 'users/sendvote' => 'users#sendvote'
     get 'users/getnext' => 'users#getnext'
+    get 'users/dump' => 'users#dump'
   end
 
   get 'movies' => 'movies#index'
