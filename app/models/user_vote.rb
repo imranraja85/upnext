@@ -5,7 +5,7 @@ class UserVote
     @user       = user
     @movie_id   = 117665
     @vote       = vote
-    @movie      = MovieDetails.new(@movie_id)
+    @movie      = Movie.new(@movie_id)
   end
 
   def store

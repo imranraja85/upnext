@@ -1,4 +1,4 @@
-class MovieDetails
+class Movie
   attr_accessor :redis, :title, :genres, :cast, :writers, :directors
 
   def initialize(movie_id)
