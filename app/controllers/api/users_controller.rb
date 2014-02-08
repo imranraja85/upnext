@@ -6,8 +6,12 @@ class Api::UsersController < ApplicationController
   def getnext
   end
 
+  #expects two parameters:
+  # movie_id: integer
+  # vote: integer
   def sendvote
-    #UserVote.vote(params)
+    UserVote.new(current_user, params[:movie_id], params[:vote]).store
+  
     #UserPreference.next_movie
     logger.info params
   end
