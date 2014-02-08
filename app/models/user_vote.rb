@@ -4,30 +4,43 @@ class UserVote
   def initialize(user, movie_id, vote)
     @user       = user
     @movie_id   = 117665
-    @vote       = vote
+    @vote       = vote #this needs to be a numerical value
     @movie      = Movie.new(@movie_id)
   end
 
   def store
     store_movie
     store_genre
-    store_people
+    store_cast
+    store_directors
+    store_writers
   end
 
   def store_movie
-    Redis.current.zadd("userMovies:#{user.id}", 1 ,"#{movie_id}")
+    Redis.current.zincrby("votes:userMovies:#{user.id}", vote, movie_id)
   end
 
   def store_genre
-     Redis.current.zadd("userGenres:#{user.id}", 1 ,"#{figureouthtemoviegenre}")
+    Array(movie.genres).each do |genre|
+      Redis.current.zincrby("votes:userGenres:#{user.id}", vote, genre)
+    end
   end
 
-  def store_people
-    Redis.current.zadd("userPeople:#{user.id}", 1 ,"#{figureoutactorids}")
-    Redis.current.zadd("userPeople:#{user.id}", 1 ,"#{figureoutwriterids}")
-    Redis.current.zadd("userPeople:#{user.id}", 1 ,"#{figureoutdirectorids}")
+  def store_cast
+    Array(movie.cast).each do |cast_member|
+      Redis.current.zincrby("votes:userPeople:#{user.id}:actors", vote, cast_member)
+    end
   end
 
+  def store_writers
+    Array(movie.writers).each do |writer|
+      Redis.current.zincrby("votes:userPeople:#{user.id}:writers", vote, writer)
+    end
+  end
+
+  def store_directors
+    Array(movie.directors).each do |director|
+      Redis.current.zincrby("votes:userPeople:#{user.id}:directors", vote, director)
+    end
+  end
 end
-
-

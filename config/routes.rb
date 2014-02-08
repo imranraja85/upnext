@@ -4,7 +4,8 @@ Upnext::Application.routes.draw do
   match 'signout', to: 'sessions#destroy', as: 'signout', via: [:get, :post]
 
   namespace :api do
-    get 'users/vote' => 'users#vote'
+    get 'users/sendvote' => 'users#sendvote'
+    get 'users/getnext' => 'users#getnext'
   end
 
   get 'movies' => 'movies#index'

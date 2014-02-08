@@ -1,13 +1,12 @@
 class Api::UsersController < ApplicationController
+  # data: {
+  #  user: "123",
+  #  room: "345"
+  # }
+  def getnext
+  end
 
-  #when a user upvotes/downvotes/skips a movie, we call this method
-  # expect to receive:
-  #   userId
-  #   roomId
-  #   movieId
-  #   vote (positive/netural/negative)
-  
-  def vote
+  def sendvote
     #UserVote.vote(params)
     #UserPreference.next_movie
     logger.info params

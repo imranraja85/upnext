@@ -10,6 +10,7 @@ gem 'coffee-rails'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 gem 'pg'
+gem 'pry'
 gem 'redis', '3.0.7'
 
 # Use SCSS for stylesheets
