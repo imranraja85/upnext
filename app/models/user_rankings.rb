@@ -82,7 +82,7 @@ class UserRankings
   #######################
   #  WEIGHT EACH ONE BY THE TOTAL RANKING
   #######################
-  def actors_ranked
+  def random_ranked_actor
     ranked = []
     Array(actors).each do |actor|
       name = actor[0] 
@@ -94,7 +94,7 @@ class UserRankings
     ranked.flatten.sample
   end
 
-  def directors_ranked
+  def random_ranked_director
     ranked = []
     Array(directors).each do |director|
       name = director[0] 
@@ -106,7 +106,7 @@ class UserRankings
     ranked.flatten.sample
   end
 
-  def genres_ranked
+  def random_ranked_genre
     ranked = []
     Array(genres).each do |genre|
       name = genre[0] 
@@ -116,5 +116,21 @@ class UserRankings
     end
 
     ranked.flatten.sample
+  end
+
+  #######################################
+  #  WEIGHTED WITH CO-ACTOR
+  ######################################
+  def random_movie_with_costar
+    actor = random_ranked_actor
+    movies_with_actor = Redis.current.zrange("actorMovies:#{actor}", 0, -1)
+    movie = Movie.new(movies_with_actor.sample)
+    costar = [movie.cast - [actor]].flatten.sample
+
+    p "top actor: #{actor}"
+    p "worked with: #{costar}"
+
+    movies_with_costar = Redis.current.zrange("actorMovies:#{costar}", 0, -1)
+    movies_with_costar.sample
   end
 end

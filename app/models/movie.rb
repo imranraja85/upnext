@@ -13,18 +13,18 @@ class Movie
   end
 
   def genres
-    @genres.split(", ")
+    @genres.sunpack("C*").pack("U*").split(", ")
   end
 
   def cast
-    @cast.split(", ").uniq
+    @cast.unpack("C*").pack("U*").split(", ").uniq
   end
 
   def writers
-    @writers.split(", ").uniq
+    @writers.unpack("C*").pack("U*").split(", ").uniq
   end
   
   def directors
-    @directors.split(", ").uniq
+    @directors.unpack("C*").pack("U*").split(", ").uniq
   end
 end
