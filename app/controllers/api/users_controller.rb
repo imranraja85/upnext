@@ -9,7 +9,6 @@ class Api::UsersController < ApplicationController
     Pusher['test_channel'].trigger('user_clicked_next', {
       message: "#{params[:user]} has clicked next"
     })
-
   end
 
   def sendvote
@@ -19,6 +18,19 @@ class Api::UsersController < ApplicationController
     rescue
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
+
+    Pusher['test_channel'].trigger('user_voted', {
+      message: "#{params[:user]} has voted: #{params[:vote]}"
+    })
+  end
+
+  def addVideo
+    movie = Movie.new(params[:movie_id])
+    Pusher['test_channel'].trigger('user_added_video', {
+      message: "#{params[:user]} added the trailer #{movie.title}"
+    })
+
+    render :json => {:success => true}
   end
 
   def dump

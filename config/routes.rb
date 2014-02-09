@@ -7,6 +7,7 @@ Upnext::Application.routes.draw do
     get 'users/sendvote' => 'users#sendvote'
     get 'users/getnext' => 'users#getnext'
     get 'users/dump' => 'users#dump'
+    get 'users/addVideo' => 'users#addVideo'
   end
 
   get 'movies' => 'movies#index'
