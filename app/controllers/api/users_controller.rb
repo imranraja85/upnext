@@ -30,15 +30,16 @@ class Api::UsersController < ApplicationController
     Redis.current.sadd("rooms:#{params[:room]}", params[:user])
 
     UserVote.new(current_user, params[:movie_id], params[:vote]).store
-    #begin
+    voted_on_movie = Movie.new(params[:movie_id])
+    begin
       @movie = Movie.new(UserRankings.new(params[:user], params[:room]).get_recommended_movie)
-    #rescue
-    #  @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
-    #end
+    rescue
+      @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
+    end
 
     if ["1", "-1"].include?(params[:vote])
       Pusher[params[:room]].trigger('growl', {
-        :message => "Someone #{map_vote(params["vote"])} #{@movie.title}!",
+        :message => "Someone #{map_vote(params["vote"])} #{voted_on_movie.title}!",
         :user_id => params[:user]
       })
     end
