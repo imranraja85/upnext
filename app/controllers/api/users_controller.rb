@@ -85,10 +85,11 @@ class Api::UsersController < ApplicationController
 
   def messageCounts
     resp = {:total_messages      => Redis.current.get("Pusher:TotalMessages"),
+            :total_user_joined   => Redis.current.get("Pusher:TotalUserJoined"),
             :total_chat_messages => Redis.current.get("Pusher:ChatMessages"),
             :total_votes         => Redis.current.get("Pusher:TotalVotes"),
             :total_positive      => Redis.current.get("Pusher:TotalUpvotes"),
-            :total_negative      => Redis.current.get("Pusher:TotalDownvotes")}       
+            :total_negative      => Redis.current.get("Pusher:TotalDownvotes")}     
 
     render :json => resp
   end
