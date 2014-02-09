@@ -3,6 +3,7 @@ class Api::UsersController < ApplicationController
     Redis.current.sadd("rooms:#{params[:room]}", params[:user])
 
     Pusher[params[:room]].trigger('growl', {
+      :title   => 'Woohoo',
       :message => "A new user has joined."
     })
 
