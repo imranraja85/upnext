@@ -226,3 +226,7 @@ class UserRankings
 
   # have a count of the movies that cast members as associated with, have a 
 end
+
+
+#only include genres that intersect
+
