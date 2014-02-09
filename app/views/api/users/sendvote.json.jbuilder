@@ -2,16 +2,12 @@
 #json.set :msg do
 #end
 
-json.set! :data do
-  json.set! :action, 'downvote'
-  json.set! :user, '999'
-  json.set! :movieId, '123'
-  json.set! :nextMovie do
-    json.set! :movieId, '456'
-    json.set! :title, 'The Hunger Games'
-    json.set! :image, 'someimage.png'
-    json.set! :year, '2013'
-    json.set! :rating, '8.1'
-    json.set! :youtubeid, '1111'
+json.response do
+  json.docs do
+    json.set! :movieId, @movie.id
+    json.set! :name, @movie.title
+    json.set! :image, @movie.poster
+    json.set! :year, @movie.year
+    json.set! :rating, @movie.rating
   end
 end
