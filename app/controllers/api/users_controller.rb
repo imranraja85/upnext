@@ -20,7 +20,7 @@ class Api::UsersController < ApplicationController
 
     UserVote.new(current_user, params[:movie_id], params[:vote]).store
     begin
-      @movie = Movie.new(UserRankings.new(params[:user]).get_recommended_movie)
+      @movie = Movie.new(UserRankings.new(params[:user], params[:room]).get_recommended_movie)
     rescue
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
@@ -41,6 +41,12 @@ class Api::UsersController < ApplicationController
       user: params[:user],
       movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
     })
+
+    render :json => {:success => true}
+  end
+
+  def lastWatched
+    Redis.current.set("rooms:lastWatched:#{params[:room]}", params[:movie_id])
 
     render :json => {:success => true}
   end

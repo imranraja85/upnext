@@ -175,15 +175,22 @@ class UserRankings
 
     movie_counts_without_actor.each do |movie, count|
       movie_detail = Movie.new(movie)
-      next if Redis.current.zrank("votes:userMovies:#{user}", movie) #user has already watched this movie
+      users_in_this_room = Redis.current.smembers("rooms:#{room}")
+
+      skip_movie = 0
+      users_in_this_room.each do |user_in_room|
+        skip_movie = 1 if Redis.current.zrank("votes:userMovies:#{user_in_room}", movie) #user has already watched this movie
+      end
+
+      next if skip_movie == 1
+
       score = count.to_f + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail, common_genres_results).to_f
       if score > highest_score
         higest_score = score
         highest_movie_id = movie
       end
     end
-    
-    binding.pry if highest_movie_id == 0
+     
     highest_movie_id
   end
 
@@ -223,7 +230,7 @@ class UserRankings
     genre_count = Hash.new(0)
     genres.flatten.each do |genre|
       if common_genres.include?(genre)
-        genre_count[genre] += 10  
+        genre_count[genre] += 3  
       else
         genre_count[genre] += 1
       end
