@@ -22,7 +22,7 @@ test:
   timeout: 5000
 
 production:
-  adapter: pg
+  adapter: postgresql
   database: upnext_production
   username: postgres
   pool: 5
