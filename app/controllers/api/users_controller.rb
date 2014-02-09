@@ -3,7 +3,8 @@ class Api::UsersController < ApplicationController
     Redis.current.sadd("rooms:#{params[:room]}", params[:user])
 
     Pusher[params[:room]].trigger('growl', {
-      :message => "A new user has joined!"
+      :message => "A new user has joined!",
+      :user_id => params[:user]
     })
 
     render :json => {:success => true}
@@ -37,7 +38,8 @@ class Api::UsersController < ApplicationController
 
     if ["1", "-1"].include?(params[:vote])
       Pusher[params[:room]].trigger('growl', {
-        :message => "Someone #{map_vote(params["vote"])} #{@movie.title}!"
+        :message => "Someone #{map_vote(params["vote"])} #{@movie.title}!",
+        :user_id => params[:user]
       })
     end
 
@@ -74,7 +76,8 @@ class Api::UsersController < ApplicationController
 
   def postMessage
     Pusher[params[:room]].trigger('growl', {
-      message: params[:message]
+      message: params[:message],
+      user_id: params[:user]
     })
 
     render :json => {:success => true}
