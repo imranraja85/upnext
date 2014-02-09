@@ -3,8 +3,7 @@ class Api::UsersController < ApplicationController
     Redis.current.sadd("rooms:#{params[:room]}", params[:user])
 
     Pusher[params[:room]].trigger('growl', {
-      :title   => 'Woohoo',
-      :message => "A new user has joined."
+      :message => "A new user has joined!"
     })
 
     render :json => {:success => true}
@@ -36,12 +35,18 @@ class Api::UsersController < ApplicationController
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
 
-    Pusher[params[:room]].trigger('user_voted', {
-      message: "#{params[:user]} has voted: #{params[:vote]}",
-      user: params[:user],
-      vote: params[:vote],
-      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
-    })
+    if ["1", "-1"].include?(params[:vote])
+      Pusher[params[:room]].trigger('growl', {
+        :message => "Someone #{map_vote(params["vote"])} #{@movie.title}!"
+      })
+    end
+
+    #Pusher[params[:room]].trigger('user_voted', {
+    #  message: "#{params[:user]} has voted: #{params[:vote]}",
+    #  user: params[:user],
+    #  vote: params[:vote],
+    #  movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
+    #})
   end
 
   def addVideo
@@ -69,5 +74,14 @@ class Api::UsersController < ApplicationController
 
   def dump
     render :json => UserRankings.new(current_user).all
+  end
+
+  private
+  def map_vote(vote)
+    if vote == '1' 
+      "Upvote"
+    elsif vote == '-1'
+      "Downvote"
+    end
   end
 end
