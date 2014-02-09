@@ -5,6 +5,7 @@ class Api::UsersController < ApplicationController
     rescue
     @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
+
   end
 
   def sendvote

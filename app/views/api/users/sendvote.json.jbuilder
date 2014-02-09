@@ -5,9 +5,8 @@
 json.response do
   json.docs do
     json.set! :id, @movie.id
-    json.set! :name, @movie.title
-    json.set! :image, @movie.poster
-    json.set! :year, @movie.year
-    json.set! :rating, @movie.rating
+    json.set! :Name, @movie.title
+    json.set! :Year, @movie.year
+    json.set! :imdbRating, @movie.rating
   end
 end

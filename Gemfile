@@ -12,6 +12,7 @@ gem 'sqlite3'
 gem 'pg'
 gem 'pry'
 gem 'redis', '3.0.7'
+gem 'pusher', '0.12.0'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'
