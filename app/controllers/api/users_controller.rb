@@ -4,6 +4,9 @@ class Api::UsersController < ApplicationController
   #  room: "345"
   # }
   def getnext
+    movie = Movie.new(UserRankings.new(current_user).get_recommended_movie)
+
+    render :json => movie
   end
 
   #  This method receives two parameters

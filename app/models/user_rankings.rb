@@ -132,7 +132,7 @@ class UserRankings
 
   def random_costar(actor)
     begin 
-      movies_with_actor = Redis.current.zrange("actorMovies:#{random_ranked_actor}", 0, -1)
+      movies_with_actor = Redis.current.zrange("actorMovies:#{actor}", 0, -1)
     end while movies_with_actor.nil?
 
     movie = Movie.new(movies_with_actor.sample)
@@ -141,22 +141,28 @@ class UserRankings
 
   def get_recommended_movie
     begin
-      actor = random_costar(random_ranked_actor).sub("-", "")
+      actor = random_costar(random_ranked_actor.sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")).sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")
       movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
     end while movie_counts_without_actor.nil?
 
+    #this is stupid.. im just going to get the last user and use their genre preferences
+    second_user = User.last
+    second_user_genres = UserRankings.new(second_user).genres
+    
     highest_score = 0
     highest_movie_id = 0
+
     movie_counts_without_actor.each do |movie, count|
       movie_detail = Movie.new(movie)
       next if Redis.current.zrank("votes:userMovies:#{user.id}", movie) #user has already watched this movie
-      score = count + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail)
+      score = count.to_f + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail).to_f
       if score > highest_score
         higest_score = score
         highest_movie_id = movie
       end
     end
     
+    binding.pry if highest_movie_id == 0
     highest_movie_id
   end
 
