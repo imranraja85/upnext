@@ -9,6 +9,7 @@ Upnext::Application.routes.draw do
     get 'users/dump' => 'users#dump'
     get 'users/addVideo' => 'users#addVideo'
     get 'users/lastWatched' => 'users#lastWatched'
+    get 'users/currentlyWatching' => 'users#currentlyWatching'
   end
 
   get 'movies' => 'movies#index'
