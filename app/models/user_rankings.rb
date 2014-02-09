@@ -136,11 +136,11 @@ class UserRankings
 
   def get_movies_for_actor
     actor = random_ranked_actor
-    get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
+    movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
+    top_genrek
     #get_top_genres_of_actors_top_movies(actor)
   end
 
-  #get all the movies of people associated to a randomly ranked actor
   def get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
     movies_id = Redis.current.zrange("actorMovies:#{actor}", 0, 10)
     
@@ -163,8 +163,9 @@ class UserRankings
       end
     end
 
-    overall_movies.flatten
-    #take each of the cast members and find all of their movies
+    movie_count = Hash.new(0)
+    overall_movies.flatten.each {|movie| movie_count[movie] += 1}
+    movie_count
   end
 
   def get_top_genres_of_actors_top_movies(actor)
@@ -174,7 +175,9 @@ class UserRankings
       genres << Movie.new(movie).genres
     end
     
-    genres.flatten
+    genre_count = Hash.new(0)
+    genres.flatten.each {|genre| genre_count[genre] += 1}
+    genre_count
   end
 
   #Dan Akroyd -> Has 10 movies -> Each has 10 ppl (! Dan Akroyd) -> Each has 10 Movies
@@ -189,5 +192,8 @@ class UserRankings
   #Do below for each "lottery ticket", then sum up score for each movie between lottery tickets
   #
   #score = movieCountAll + (imdbScore * 3) + genreCountOriginalEntity
+  # genre count for each of bill murrays movies
+
+  # have a count of the movies that cast members as associated with, have a 
 end
 
