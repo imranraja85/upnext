@@ -1,8 +1,9 @@
 class UserRankings
-  attr_accessor :user
+  attr_accessor :user, :room
 
-  def initialize(user)
+  def initialize(user, room = nil)
     @user = user
+    @room = room
   end
 
   def all
@@ -140,6 +141,15 @@ class UserRankings
   end
 
   def get_recommended_movie
+    #p "*" * 50
+    #p Redis.current.smembers("rooms:#{room}")
+    #users_in_this_room = Redis.current.smembers("rooms:#{room}")
+    #if users_in_this_room > 1
+    #  users_in_this_room.each do |user|
+    #    UserRankings.new("user").genrej
+    #  end
+    #end
+
     begin
       actor = random_costar(random_ranked_actor)
       movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
