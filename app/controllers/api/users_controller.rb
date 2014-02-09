@@ -46,13 +46,14 @@ class Api::UsersController < ApplicationController
   end
 
   def currentlyWatching
-    Redis.current.get("rooms:currentlyWatching:#{params[:room]}")
-    render :json => {:success => true}
+    movie_id = Redis.current.get("rooms:lastWatched:#{params[:room]}")
+    @movie = Movie.new(movie_id)
   end
 
   def lastWatched
     Redis.current.set("rooms:lastWatched:#{params[:room]}", params[:movie_id])
-    render :json => {:success => true}
+
+    render :json => {:movie => true}
   end
 
   def dump
