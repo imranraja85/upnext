@@ -1,4 +1,15 @@
 class Api::UsersController < ApplicationController
+  def userJoined
+    Redis.current.sadd("rooms:#{params[:room]}", params[:user])
+    room_user_count = Redis.current.smembers("rooms:#{params[:room]}").count
+
+    Pusher[params[:room]].trigger('user_joined', {
+      :count => room_user_count
+    })
+
+    render :json => {:count => room_user_count}
+  end
+
   def getnext
     Redis.current.sadd("rooms:#{params[:room]}", params[:user])
 
