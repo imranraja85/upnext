@@ -134,17 +134,28 @@ class UserRankings
     movies_with_costar.sample
   end
 
-  def get_movies_for_actor
+  def get_recommended_movie
     actor = random_ranked_actor
     movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
-    top_genrek
-    #get_top_genres_of_actors_top_movies(actor)
+
+    highest_score = 0
+    highest_movie_id = 0
+    movie_counts_without_actor.each do |movie, count|
+      movie_detail = Movie.new(movie)
+      next if Redis.current.zrank("votes:userMovies:#{user.id}", movie) #user has already watched this movie
+      score = count + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail)
+      if score > highest_score
+        higest_score = score
+        highest_movie_id = movie
+      end
+    end
+    
+    highest_movie_id
   end
 
   def get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
     movies_id = Redis.current.zrange("actorMovies:#{actor}", 0, 10)
     
-    #goes through all the movies a actor has been in and spits out the cast members
     overall_movies = []
     Array(movies_id).each do |movie_id|
       movie = Movie.new(movie_id)
@@ -180,6 +191,18 @@ class UserRankings
     genre_count
   end
 
+  def score_genres_in_common_with_actor(actor, movie)
+    genre_count = get_top_genres_of_actors_top_movies(actor)
+    score = 0
+    genre_count.each do |genre, count|
+      if Array(movie.genres).include?(genre)
+        score = score + count.to_f
+      end
+    end
+
+    score
+  end
+
   #Dan Akroyd -> Has 10 movies -> Each has 10 ppl (! Dan Akroyd) -> Each has 10 Movies
   #
   #1000 movies for each lottery ticket
@@ -196,4 +219,3 @@ class UserRankings
 
   # have a count of the movies that cast members as associated with, have a 
 end
-
