@@ -8,5 +8,6 @@ json.response do
     json.set! :name, @movie.title
     json.set! :Year, @movie.year
     json.set! :imdbRating, @movie.rating
+    json.set! :hi, "HI"
   end
 end
