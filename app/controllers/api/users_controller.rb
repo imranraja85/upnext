@@ -8,7 +8,7 @@ class Api::UsersController < ApplicationController
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
 
-    Pusher['test_channel'].trigger('user_clicked_next', {
+    Pusher[params[:room]].trigger('user_clicked_next', {
       message: "#{params[:user]} has clicked next",
       user: params[:user],
       movie: @movie.title
@@ -25,20 +25,21 @@ class Api::UsersController < ApplicationController
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
 
-    Pusher['test_channel'].trigger('user_voted', {
+    Pusher[params[:room]].trigger('user_voted', {
       message: "#{params[:user]} has voted: #{params[:vote]}",
       user: params[:user],
-      vote: params[:vote]
+      vote: params[:vote],
+      movie: Movie.new(params[:movie_id]).title,
     })
   end
 
   def addVideo
     movie = Movie.new(params[:movie_id])
 
-    Pusher['test_channel'].trigger('user_added_video', {
+    Pusher[params[:room]].trigger('user_added_video', {
       message: "#{params[:user]} added the trailer #{movie.title}",
       user: params[:user],
-      movie: movie.title
+      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
     })
 
     render :json => {:success => true}
