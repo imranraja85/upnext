@@ -10,7 +10,7 @@ class Api::UsersController < ApplicationController
 
     Pusher['test_channel'].trigger('user_clicked_next', {
       message: "#{params[:user]} has clicked next",
-      user: params[:user]
+      user: params[:user],
       movie: @movie.title
     })
   end
