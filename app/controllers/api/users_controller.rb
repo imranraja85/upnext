@@ -2,7 +2,11 @@ class Api::UsersController < ApplicationController
   def getnext
     p current_user
     p "*" * 50
+    begin
     movie = Movie.new(UserRankings.new(params[:user]).get_recommended_movie)
+    rescue
+    movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
+    end
     render :json => movie
   end
 
