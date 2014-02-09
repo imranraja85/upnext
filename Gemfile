@@ -1,11 +1,10 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.0.0'
+gem 'rails', '4.0.2'
 gem 'omniauth'
 gem 'omniauth-facebook', '1.4.0'
 gem 'capistrano', '~> 3.1.0'
-gem 'capistrano-rvm'
 gem 'coffee-rails'
 
 # Use sqlite3 as the database for Active Record
@@ -24,7 +23,8 @@ gem 'uglifier', '>= 1.3.0'
 #gem 'coffee-rails', '~> 4.0.0'
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-gem 'therubyracer', platforms: :ruby
+gem 'therubyracer', '0.11.4'
+gem 'capistrano-rvm', '0.1.1'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
