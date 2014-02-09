@@ -91,7 +91,7 @@ class UserRankings
       ranked << [name] * value.to_i.abs
     end
 
-    ranked.flatten.sample
+    ranked.flatten.sample.sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")
   end
 
   def random_ranked_director
@@ -136,19 +136,15 @@ class UserRankings
     end while movies_with_actor.nil?
 
     movie = Movie.new(movies_with_actor.sample)
-    [movie.cast - [actor]].flatten.sample
+    [movie.cast - [actor]].flatten.sample.sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")
   end
 
   def get_recommended_movie
     begin
-      actor = random_costar(random_ranked_actor.sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")).sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")
+      actor = random_costar(random_ranked_actor)
       movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
     end while movie_counts_without_actor.nil?
 
-    #this is stupid.. im just going to get the last user and use their genre preferences
-    second_user = User.last
-    second_user_genres = UserRankings.new(second_user).genres
-    
     highest_score = 0
     highest_movie_id = 0
 

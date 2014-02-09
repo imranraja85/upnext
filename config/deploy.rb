@@ -1,92 +1,63 @@
-require 'bundler/capistrano'
- 
-# This capistrano deployment recipe is made to work with the optional
-# StackScript provided to all Rails Rumble teams in their Linode dashboard.
-#
-# After setting up your Linode with the provided StackScript, configuring
-# your Rails app to use your GitHub repository, and copying your deploy
-# key from your server's ~/.ssh/github-deploy-key.pub to your GitHub
-# repository's Admin / Deploy Keys section, you can configure your Rails
-# app to use this deployment recipe by doing the following:
-#
-# 1. Add `gem 'capistrano', '~> 2.15'` to your Gemfile.
-# 2. Run `bundle install --binstubs --path=vendor/bundles`.
-# 3. Run `bin/capify .` in your app's root directory.
-# 4. Replace your new config/deploy.rb with this file's contents.
-# 5. Configure the two parameters in the Configuration section below.
-# 6. Run `git commit -a -m "Configured capistrano deployments."`.
-# 7. Run `git push origin master`.
-# 8. Run `bin/cap deploy:setup`.
-# 9. Run `bin/cap deploy:migrations` or `bin/cap deploy`.
-#
-# Note: You may also need to add your local system's public key to
-# your GitHub repository's Admin / Deploy Keys area.
-#
-# Note: When deploying, you'll be asked to enter your server's root
-# password. To configure password-less deployments, see below.
- 
-#############################################
-##                                         ##
-##              Configuration              ##
-##                                         ##
-#############################################
- 
-GITHUB_REPOSITORY_NAME = 'nextup'
-SERVER_HOSTNAME = '192.241.162.190'
- 
-#############################################
-#############################################
- 
-# General Options
- 
-set :bundle_flags,               "--deployment"
- 
-set :application,                "upnext"
-set :deploy_to,                  "/var/www/apps/upnext"
-set :normalize_asset_timestamps, false
-set :rails_env,                  "production"
- 
-set :user,                       "matrym"
-set :runner,                     "www-data"
-set :admin_runner,               "www-data"
- 
-# Password-less Deploys (Optional)
-#
-# 1. Locate your local public SSH key file. (Usually ~/.ssh/id_rsa.pub)
-# 2. Execute the following locally: (You'll need your Linode server's root password.)
-#
-#    cat ~/.ssh/id_rsa.pub | ssh root@SERVER_HOSTNAME "cat >> ~/.ssh/authorized_keys"
-#
-# 3. Uncomment the below ssh_options[:keys] line in this file.
-#
-# ssh_options[:keys] = ["~/.ssh/id_rsa"]
- 
-# SCM Options
-set :scm,        :git
-set :repository, "git@github.com:imranraja85/#{GITHUB_REPOSITORY_NAME}.git"
-set :branch,     "master"
- 
-# Roles
-role :app, SERVER_HOSTNAME
-role :db,  SERVER_HOSTNAME, :primary => true
- 
-# Add Configuration Files & Compile Assets
-after 'deploy:update_code' do
-  # Setup Configuration
-  run "cp #{shared_path}/config/database.yml #{release_path}/config/database.yml"
- 
-  # Compile Assets
-  run "cd #{release_path}; RAILS_ENV=production bundle exec rake assets:precompile"
-end
- 
-# Restart Passenger
-deploy.task :restart, :roles => :app do
-  # Fix Permissions
-  sudo "chown -R www-data:www-data #{current_path}"
-  sudo "chown -R www-data:www-data #{latest_release}"
-  sudo "chown -R www-data:www-data #{shared_path}/bundle"
-  sudo "chown -R www-data:www-data #{shared_path}/log"
- 
-  # Restart Application
-  run "touch #{current_path}/tmp/restart.txt"
+# config valid only for Capistrano 3.1
+lock '3.1.0'
+
+set :application, 'nextup'
+#set :repo_url, 'git@example.com:me/my_repo.git'
+#set :repo_url, "ssh://github.com/imranraja85/upnext.git"
+set :repo_url, 'git@github.com:imranraja85/upnext.git'
+
+
+# Default branch is :master
+# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
+
+# Default deploy_to directory is /var/www/my_app
+set :deploy_to, '/var/www/nextup'
+
+# Default value for :scm is :git
+set :scm, :git
+
+# Default value for :format is :pretty
+# set :format, :pretty
+
+# Default value for :log_level is :debug
+# set :log_level, :debug
+
+# Default value for :pty is false
+set :pty, true
+
+set :ssh_options, { :forward_agent => true }
+
+
+# Default value for :linked_files is []
+# set :linked_files, %w{config/database.yml}
+
+# Default value for linked_dirs is []
+set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+
+# Default value for default_env is {}
+# set :default_env, { path: "/opt/ruby/bin:$PATH" }
+
+# Default value for keep_releases is 5
+# set :keep_releases, 5
+
+namespace :deploy do
+
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      # Your restart mechanism here, for example:
+      execute :touch, release_path.join('tmp/restart.txt')
+    end
+  end
+
+  after :publishing, :restart
+
+  after :restart, :clear_cache do
+    on roles(:web), in: :groups, limit: 3, wait: 10 do
+      # Here we can do anything such as:
+      # within release_path do
+      #   execute :rake, 'cache:clear'
+      # end
+    end
+  end
 end
