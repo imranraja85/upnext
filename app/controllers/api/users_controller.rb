@@ -7,6 +7,9 @@ class Api::UsersController < ApplicationController
       :user_id => params[:user]
     })
 
+    Redis.current.incr("Pusher:TotalUserJoined")
+    Redis.current.incr("Pusher:TotalMessages")
+
     render :json => {:success => true}
   end
 
@@ -19,11 +22,11 @@ class Api::UsersController < ApplicationController
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
 
-    Pusher[params[:room]].trigger('user_clicked_next', {
-      message: "#{params[:user]} has clicked next",
-      user: params[:user],
-      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
-    })
+    #Pusher[params[:room]].trigger('user_clicked_next', {
+    #  message: "#{params[:user]} has clicked next",
+    #  user: params[:user],
+    #  movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
+    #})
   end
 
   def sendvote
@@ -42,24 +45,14 @@ class Api::UsersController < ApplicationController
         :message => "Someone #{map_vote(params["vote"])} #{voted_on_movie.title}!",
         :user_id => params[:user]
       })
+     Redis.current.incr("Pusher:TotalVotes")
+     Redis.current.incr("Pusher:TotalMessages")
     end
 
-    #Pusher[params[:room]].trigger('user_voted', {
-    #  message: "#{params[:user]} has voted: #{params[:vote]}",
-    #  user: params[:user],
-    #  vote: params[:vote],
-    #  movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
-    #})
   end
 
   def addVideo
     movie = Movie.new(params[:movie_id])
-
-    #Pusher[params[:room]].trigger('user_added_video', {
-    #  message: "#{params[:user]} added the trailer #{movie.title}",
-    #  user: params[:user],
-    #  movie: {:id => params[:movie_id], :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
-    #})
 
     render :json => {:success => true}
   end
@@ -80,6 +73,8 @@ class Api::UsersController < ApplicationController
       message: params[:message],
       user_id: params[:user]
     })
+    Redis.current.incr("Pusher:ChatMessages")
+    Redis.current.incr("Pusher:TotalMessages")
 
     render :json => {:success => true}
   end
@@ -88,11 +83,23 @@ class Api::UsersController < ApplicationController
     render :json => UserRankings.new(current_user).all
   end
 
+  def messageCounts
+    resp = {:total_messages      => Redis.current.get("Pusher:TotalMessages"),
+            :total_chat_messages => Redis.current.get("Pusher:ChatMessages"),
+            :total_votes         => Redis.current.get("Pusher:TotalVotes"),
+            :total_positive      => Redis.current.get("Pusher:TotalUpvotes"),
+            :total_negative      => Redis.current.get("Pusher:TotalDownvotes")}       
+
+    render :json => resp
+  end
+
   private
   def map_vote(vote)
     if vote == '1' 
+       Redis.current.incr("Pusher:TotalUpvotes")
       "upvoted"
     elsif vote == '-1'
+       Redis.current.incr("Pusher:TotalDownvotes")
       "downvoted"
     end
   end
