@@ -133,4 +133,61 @@ class UserRankings
     movies_with_costar = Redis.current.zrange("actorMovies:#{costar}", 0, -1)
     movies_with_costar.sample
   end
+
+  def get_movies_for_actor
+    actor = random_ranked_actor
+    get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
+    #get_top_genres_of_actors_top_movies(actor)
+  end
+
+  #get all the movies of people associated to a randomly ranked actor
+  def get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
+    movies_id = Redis.current.zrange("actorMovies:#{actor}", 0, 10)
+    
+    #goes through all the movies a actor has been in and spits out the cast members
+    overall_movies = []
+    Array(movies_id).each do |movie_id|
+      movie = Movie.new(movie_id)
+      
+      Array(movie.directors).each do |director|
+        overall_movies << Redis.current.zrange("directorMovies:#{director}", 0, -1)
+      end
+
+      Array(movie.cast).each do |cast_member|
+        next if cast_member == actor
+        overall_movies << Redis.current.zrange("actorMovies:#{cast_member}", 0, -1)
+      end
+
+      Array(movie.writers).each do |writer|
+        overall_movies << Redis.current.zrange("writerMovies:#{writer}", 0, -1)
+      end
+    end
+
+    overall_movies.flatten
+    #take each of the cast members and find all of their movies
+  end
+
+  def get_top_genres_of_actors_top_movies(actor)
+    genres = []
+    movies = Redis.current.zrange("actorMovies:#{actor}", 0, -1)
+    movies.each do |movie|
+      genres << Movie.new(movie).genres
+    end
+    
+    genres.flatten
+  end
+
+  #Dan Akroyd -> Has 10 movies -> Each has 10 ppl (! Dan Akroyd) -> Each has 10 Movies
+  #
+  #1000 movies for each lottery ticket
+  #
+  #movieCountAll = number of times the candidate movie was linked to in our walker
+  #
+  #genreCount = Of Dan Akroyd's top 10 movies (by imdbRating), what were the genres?
+  #
+  #
+  #Do below for each "lottery ticket", then sum up score for each movie between lottery tickets
+  #
+  #score = movieCountAll + (imdbScore * 3) + genreCountOriginalEntity
 end
+

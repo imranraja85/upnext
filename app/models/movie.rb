@@ -13,7 +13,7 @@ class Movie
   end
 
   def genres
-    @genres.sunpack("C*").pack("U*").split(", ")
+    @genres.unpack("C*").pack("U*").split(", ")
   end
 
   def cast
