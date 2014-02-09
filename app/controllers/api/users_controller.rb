@@ -9,7 +9,9 @@ class Api::UsersController < ApplicationController
     end
 
     Pusher['test_channel'].trigger('user_clicked_next', {
-      message: "#{params[:user]} has clicked next"
+      message: "#{params[:user]} has clicked next",
+      user: params[:user]
+      movie: @movie.title
     })
   end
 
@@ -32,6 +34,7 @@ class Api::UsersController < ApplicationController
 
   def addVideo
     movie = Movie.new(params[:movie_id])
+
     Pusher['test_channel'].trigger('user_added_video', {
       message: "#{params[:user]} added the trailer #{movie.title}",
       user: params[:user],

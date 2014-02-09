@@ -141,14 +141,13 @@ class UserRankings
   end
 
   def get_recommended_movie
-    #p "*" * 50
-    #p Redis.current.smembers("rooms:#{room}")
-    #users_in_this_room = Redis.current.smembers("rooms:#{room}")
-    #if users_in_this_room > 1
-    #  users_in_this_room.each do |user|
-    #    UserRankings.new("user").genrej
-    #  end
-    #end
+    p "*" * 50
+    p Redis.current.smembers("rooms:#{room}")
+    users_in_this_room = Redis.current.smembers("rooms:#{room}")
+    genres_from_all_users = []
+    Array(users_in_this_room).each do |user_in_room|
+      genres_from_all_users << UserRankings.new(user_in_room).genres
+    end
 
     begin
       actor = random_costar(random_ranked_actor)
