@@ -92,7 +92,11 @@ class UserRankings
       ranked << [name] * value.to_i.abs
     end
 
-    ranked.flatten.sample.sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")
+    if ranked.nil?
+      ranked = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 10).sample).cast.sample
+    end
+
+    Array(ranked).flatten.sample.sub("-", "").sub(".","").sub(",", "").sub("_", "").sub("'","")
   end
 
   def random_ranked_director
@@ -141,13 +145,25 @@ class UserRankings
   end
 
   def get_recommended_movie
-    p "*" * 50
-    p Redis.current.smembers("rooms:#{room}")
     users_in_this_room = Redis.current.smembers("rooms:#{room}")
     genres_from_all_users = []
+    #for each user the room, get all their genres
     Array(users_in_this_room).each do |user_in_room|
-      genres_from_all_users << UserRankings.new(user_in_room).genres
+      genres_from_all_users << UserRankings.new(user_in_room).genres.flatten
     end
+
+    normal = []
+    arry = []
+    Array(genres_from_all_users).each do |a_users_preferences|
+      arry = []
+      a_users_preferences.each_with_index do |pre, i|
+        arry << pre if i.even?
+      end
+      normal << arry
+    end
+
+    common_genres_results = [] #FINALLY THE GENRE INTERSECTION
+    common_genres = normal.each_cons(2) {|x| results = x[0] & x [1]}
 
     begin
       actor = random_costar(random_ranked_actor)
@@ -160,7 +176,7 @@ class UserRankings
     movie_counts_without_actor.each do |movie, count|
       movie_detail = Movie.new(movie)
       next if Redis.current.zrank("votes:userMovies:#{user}", movie) #user has already watched this movie
-      score = count.to_f + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail).to_f
+      score = count.to_f + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail, common_genres_results).to_f
       if score > highest_score
         higest_score = score
         highest_movie_id = movie
@@ -197,7 +213,7 @@ class UserRankings
     movie_count
   end
 
-  def get_top_genres_of_actors_top_movies(actor)
+  def get_top_genres_of_actors_top_movies(actor, common_genres)
     genres = []
     movies = Redis.current.zrange("actorMovies:#{actor}", 0, -1)
     movies.each do |movie|
@@ -205,12 +221,18 @@ class UserRankings
     end
     
     genre_count = Hash.new(0)
-    genres.flatten.each {|genre| genre_count[genre] += 1}
+    genres.flatten.each do |genre|
+      if common_genres.include?(genre)
+        genre_count[genre] += 10  
+      else
+        genre_count[genre] += 1
+      end
+    end
     genre_count
   end
 
-  def score_genres_in_common_with_actor(actor, movie)
-    genre_count = get_top_genres_of_actors_top_movies(actor)
+  def score_genres_in_common_with_actor(actor, movie, common_genres)
+    genre_count = get_top_genres_of_actors_top_movies(actor, common_genres)
     score = 0
     genre_count.each do |genre, count|
       if Array(movie.genres).include?(genre)
