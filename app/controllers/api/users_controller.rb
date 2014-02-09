@@ -57,7 +57,7 @@ class Api::UsersController < ApplicationController
     Pusher[params[:room]].trigger('user_added_video', {
       message: "#{params[:user]} added the trailer #{movie.title}",
       user: params[:user],
-      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
+      movie: {:id => params[:movie_id], :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
     })
 
     render :json => {:success => true}
