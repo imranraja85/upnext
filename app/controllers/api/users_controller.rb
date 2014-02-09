@@ -11,7 +11,7 @@ class Api::UsersController < ApplicationController
     Pusher[params[:room]].trigger('user_clicked_next', {
       message: "#{params[:user]} has clicked next",
       user: params[:user],
-      movie: @movie.title
+      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
     })
   end
 
@@ -29,7 +29,7 @@ class Api::UsersController < ApplicationController
       message: "#{params[:user]} has voted: #{params[:vote]}",
       user: params[:user],
       vote: params[:vote],
-      movie: Movie.new(params[:movie_id]).title,
+      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
     })
   end
 

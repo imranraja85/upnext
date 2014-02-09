@@ -250,23 +250,4 @@ class UserRankings
     score
   end
 
-  #Dan Akroyd -> Has 10 movies -> Each has 10 ppl (! Dan Akroyd) -> Each has 10 Movies
-  #
-  #1000 movies for each lottery ticket
-  #
-  #movieCountAll = number of times the candidate movie was linked to in our walker
-  #
-  #genreCount = Of Dan Akroyd's top 10 movies (by imdbRating), what were the genres?
-  #
-  #
-  #Do below for each "lottery ticket", then sum up score for each movie between lottery tickets
-  #
-  #score = movieCountAll + (imdbScore * 3) + genreCountOriginalEntity
-  # genre count for each of bill murrays movies
-
-  # have a count of the movies that cast members as associated with, have a 
 end
-
-
-#only include genres that intersect
-
