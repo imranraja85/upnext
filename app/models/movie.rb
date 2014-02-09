@@ -2,7 +2,7 @@ class Movie
   attr_accessor :redis, :title, :genres, :cast, :writers, :directors, :poster, :year, :rating
 
   def initialize(movie_id)
-    movie_hash = Redis.current.hmget("imdb:#{movie_id}", "Title", "Genre", "Cast", "Writer", "Director", "Year", "Poster", "imdbRating")
+    movie_hash = Redis.current.hmget("imdb:#{movie_id}", "Title", "Genre", "Cast", "Writer", "Director", "Year", "Poster", "imdbRating", "ID")
     @title      = movie_hash[0] 
     @genres     = movie_hash[1]
     @cast       = movie_hash[2]
@@ -11,6 +11,7 @@ class Movie
     @year       = movie_hash[5]
     @poster     = movie_hash[6]
     @rating     = movie_hash[7]
+    @id         = movie_hash[8]
   end
 
   def genres
