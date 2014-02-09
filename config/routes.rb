@@ -11,6 +11,7 @@ Upnext::Application.routes.draw do
     get 'users/lastWatched' => 'users#lastWatched'
     get 'users/currentlyWatching' => 'users#lastWatched'
     get 'users/userJoined' => 'users#userJoined'
+    get 'users/postMessage' => 'users#postMessage'
   end
 
   get 'movies' => 'movies#index'

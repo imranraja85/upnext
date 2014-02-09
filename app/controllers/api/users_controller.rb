@@ -72,6 +72,14 @@ class Api::UsersController < ApplicationController
     render :json => {:movie => true}
   end
 
+  def postMessage
+    Pusher[params[:room]].trigger('growl', {
+      message: params[:message]
+    })
+
+    render :json => {:success => true}
+  end
+
   def dump
     render :json => UserRankings.new(current_user).all
   end
