@@ -22,11 +22,11 @@ class Api::UsersController < ApplicationController
       @movie = Movie.new(Redis.current.zrevrange("keys:imdb:byVotes", 0, 200).sample)
     end
 
-    #Pusher[params[:room]].trigger('user_clicked_next', {
-    #  message: "#{params[:user]} has clicked next",
-    #  user: params[:user],
-    #  movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
-    #})
+    Pusher[params[:room]].trigger('user_clicked_next', {
+      message: "#{params[:user]} has clicked next",
+      user: params[:user],
+      movie: {:id => @movie.id, :name => @movie.title, :Year => @movie.year, :imdbRating => @movie.rating}
+    })
   end
 
   def sendvote
