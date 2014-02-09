@@ -9,7 +9,7 @@ json.response do
     json.set! :movieId, '123'
     json.set! :nextMovie do
       json.set! :movieId, @movie.id
-      json.set! :title, @movie.title
+      json.set! :name, @movie.title
       json.set! :image, @movie.poster
       json.set! :year, @movie.year
       json.set! :rating, @movie.rating
