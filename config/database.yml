@@ -22,7 +22,9 @@ test:
   timeout: 5000
 
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
+  adapter: pg
+  database: upnext_production
+  username: postgres
   pool: 5
+  password: p@ssword
   timeout: 5000
