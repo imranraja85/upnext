@@ -16,23 +16,23 @@ class UserRankings
   end
 
   def movies
-    Redis.current.zrange("votes:userMovies:#{user.id}", 0, -1, {with_scores: true}).reverse
+    Redis.current.zrange("votes:userMovies:#{user}", 0, -1, {with_scores: true}).reverse
   end
 
   def genres
-    Redis.current.zrange("votes:userGenres:#{user.id}", 0, -1, {with_scores: true}).reverse
+    Redis.current.zrange("votes:userGenres:#{user}", 0, -1, {with_scores: true}).reverse
   end
 
   def actors
-    Redis.current.zrange("votes:userPeople:#{user.id}:actors", 0, -1, {with_scores: true}).reverse
+    Redis.current.zrange("votes:userPeople:#{user}:actors", 0, -1, {with_scores: true}).reverse
   end
 
   def writers
-    Redis.current.zrange("votes:userPeople:#{user.id}:writers", 0, -1, {with_scores: true}).reverse
+    Redis.current.zrange("votes:userPeople:#{user}:writers", 0, -1, {with_scores: true}).reverse
   end
 
   def directors
-    Redis.current.zrange("votes:userPeople:#{user.id}:directors", 0, -1, {with_scores: true}).reverse
+    Redis.current.zrange("votes:userPeople:#{user}:directors", 0, -1, {with_scores: true}).reverse
   end
 
   
@@ -150,7 +150,7 @@ class UserRankings
 
     movie_counts_without_actor.each do |movie, count|
       movie_detail = Movie.new(movie)
-      next if Redis.current.zrank("votes:userMovies:#{user.id}", movie) #user has already watched this movie
+      next if Redis.current.zrank("votes:userMovies:#{user}", movie) #user has already watched this movie
       score = count.to_f + movie_detail.rating.to_f + score_genres_in_common_with_actor(actor, movie_detail).to_f
       if score > highest_score
         higest_score = score

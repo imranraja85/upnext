@@ -1,16 +1,11 @@
 class Api::UsersController < ApplicationController
-  # data: {
-  #  user: "123",
-  #  room: "345"
-  # }
   def getnext
-    movie = Movie.new(UserRankings.new(current_user).get_recommended_movie)
-
+    p current_user
+    p "*" * 50
+    movie = Movie.new(UserRankings.new(params[:user]).get_recommended_movie)
     render :json => movie
   end
 
-  #  This method receives two parameters
-  #
   #  movie_id: integer
   #  vote: integer
   def sendvote

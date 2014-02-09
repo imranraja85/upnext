@@ -17,30 +17,30 @@ class UserVote
   end
 
   def store_movie
-    Redis.current.zincrby("votes:userMovies:#{user.id}", vote, movie_id)
+    Redis.current.zincrby("votes:userMovies:#{user}", vote, movie_id)
   end
 
   def store_genre
     Array(movie.genres).each do |genre|
-      Redis.current.zincrby("votes:userGenres:#{user.id}", vote, genre)
+      Redis.current.zincrby("votes:userGenres:#{user}", vote, genre)
     end
   end
 
   def store_cast
     Array(movie.cast).each do |cast_member|
-      Redis.current.zincrby("votes:userPeople:#{user.id}:actors", vote, cast_member)
+      Redis.current.zincrby("votes:userPeople:#{user}:actors", vote, cast_member)
     end
   end
 
   def store_writers
     Array(movie.writers).each do |writer|
-      Redis.current.zincrby("votes:userPeople:#{user.id}:writers", vote, writer)
+      Redis.current.zincrby("votes:userPeople:#{user}:writers", vote, writer)
     end
   end
 
   def store_directors
     Array(movie.directors).each do |director|
-      Redis.current.zincrby("votes:userPeople:#{user.id}:directors", vote, director)
+      Redis.current.zincrby("votes:userPeople:#{user}:directors", vote, director)
     end
   end
 end
