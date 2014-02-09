@@ -6,6 +6,8 @@ class Api::UsersController < ApplicationController
   def getnext
   end
 
+  #  This method receives two parameters
+  #
   #  movie_id: integer
   #  vote: integer
   def sendvote

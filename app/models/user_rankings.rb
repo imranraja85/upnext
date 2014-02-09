@@ -88,7 +88,7 @@ class UserRankings
       name = actor[0] 
       value = actor[1]
       
-      ranked << [name] * value.to_i
+      ranked << [name] * value.to_i.abs
     end
 
     ranked.flatten.sample
@@ -121,22 +121,29 @@ class UserRankings
   #######################################
   #  WEIGHTED WITH CO-ACTOR
   ######################################
-  def random_movie_with_costar
-    actor = random_ranked_actor
+  def random_movie_with_costar(actor)
     movies_with_actor = Redis.current.zrange("actorMovies:#{actor}", 0, -1)
     movie = Movie.new(movies_with_actor.sample)
     costar = [movie.cast - [actor]].flatten.sample
-
-    p "top actor: #{actor}"
-    p "worked with: #{costar}"
 
     movies_with_costar = Redis.current.zrange("actorMovies:#{costar}", 0, -1)
     movies_with_costar.sample
   end
 
+  def random_costar(actor)
+    begin 
+      movies_with_actor = Redis.current.zrange("actorMovies:#{random_ranked_actor}", 0, -1)
+    end while movies_with_actor.nil?
+
+    movie = Movie.new(movies_with_actor.sample)
+    [movie.cast - [actor]].flatten.sample
+  end
+
   def get_recommended_movie
-    actor = random_ranked_actor
-    movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
+    begin
+      actor = random_costar(random_ranked_actor).sub("-", "")
+      movie_counts_without_actor = get_movies_of_people_associated_with_a_randomly_ranked_actor(actor)
+    end while movie_counts_without_actor.nil?
 
     highest_score = 0
     highest_movie_id = 0
